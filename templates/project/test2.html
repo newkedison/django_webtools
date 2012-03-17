@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <title>模拟单选钮2</title>
+    <script language='JavaScript'>
+      /* <![CDATA[ */
+
+      //创建一个可独立使用的模拟的单选钮
+      function RadioButton(id){
+        var radName = 'pRadio', markName = 'mark';
+        var stem = {};
+        var checkedIndex = -1, value;
+        var item, items = [], mark;
+        var ns = 'http://www.w3.org/2000/svg';
+        //给各个单选钮添加鼠标单击的事件处理程序。
+        function init(){
+          var rad = document.getElementById(id);
+          var circles = rad.getElementsByTagName('circle');
+          for (var i = 0, circle; i < circles.length; i++) {
+            circle = circles[i];
+            if (circle.getAttribute('name') === radName) {
+              items.push(circle);
+              circle.addEventListener('click', function(){
+                //这里的index是根据各个单选钮在svg中出现的先后顺序。
+                setIndex(items.indexOf(this));                                
+              }, true)
+            }
+            else 
+            if (circle.getAttribute('name') === markName) {
+              mark = circle;
+            }
+          }
+
+        }
+        //选中某项后，更新数据和显示。
+        function setIndex(index){
+          checkedIndex = index;
+          var item = items[index];
+          value = item.getAttribute('value');
+          mark.setAttribute('cx', item.getAttribute('cx'));
+          mark.setAttribute('cy', item.getAttribute('cy'));
+          mark.style.display = 'block';
+        }
+        //供在脚本中选择某项使用，相当于在HTML中设置某个单选钮的checked属性。
+        stem.setCheckedIndex = function(index){
+          if (index > -1 && index < items.length) {
+            setIndex(index);
+          }
+        }
+        //读取选中项的index，相当于在HTML中读取某个单选钮的checked属性。
+        stem.getCheckedIndex = function(){
+          return checkedIndex;
+        }
+        //读取选中项的值。
+        stem.getValue = function(){
+          return value;
+        }
+
+        init();
+        return stem;
+      }
+      //测试模拟的单选钮。
+      function testRadio(){
+        //获取用脚本和SVG模拟的单选钮。
+        var rad = RadioButton('radColor');
+        //测试选中第二项。
+        rad.setCheckedIndex(1);
+        //使用一个按钮，显示单选钮选中项的序号和值。
+        document.getElementById('testRadio').addEventListener('click', function(){
+          var msg = 'index: ' + rad.getCheckedIndex() + ' value: ' + rad.getValue();
+          document.getElementById('message').innerHTML = msg;
+        }, true)
+      }
+
+      window.addEventListener('load', testRadio, true);
+      /* ]]> */
+    </script>
+  </head>
+  <body>
+    模拟单选钮
+    <br/>
+    <input type='button' id='testRadio' value='显示单选钮的选中项'/>
+    <br/>
+    <div id="message">
+    </div>
+    <svg width="100" height="100">
+    <g id='radColor'>
+    <circle name='pRadio' cx="20" cy="20" r="6" stroke="black" stroke-width='0.5' fill="white" value='red'/>
+    <text x='28' y='26'>
+    红色
+    </text>
+    <circle name='pRadio' cx="20" cy="50" r="6" stroke="black" stroke-width='0.5' fill="white" value='green'/>
+    <text x='28' y='56'>
+    绿色
+    </text>
+    <circle name='pRadio' cx="20" cy="80" r="6" stroke="black" stroke-width='0.5' fill="white" value='blue'/>
+    <text x='28' y='86'>
+    蓝色
+    </text>
+    <circle name='mark' cx="20" cy="20" r="2" style='display:none;'/>
+    </g>
+    </svg>
+  </body>
+</html>

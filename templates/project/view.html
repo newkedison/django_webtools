@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" media="screen" />
+    <script src="/js/init.js" type="text/javascript"></script>
+    <script language="javascript">
+      window.addEventListener('load', initBar, true);
+      window.addEventListener('load', initPoint, true);
+    </script>
+  </head>
+  <body>
+    <svg id="pic" width = "1000" height="300">
+    {% for bar in bars %}
+    <rect class="bar" x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.length }}" fill="{{ bar.color }}" onclick=toggle("sub_bar_1") />
+    {% endfor %}
+    <svg>
+  </body>
+</html>
