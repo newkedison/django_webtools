@@ -8,9 +8,14 @@
     </script>
   </head>
   <body>
-    <svg id="pic" width = "1000" height="300">
+    <svg id="pic" x="{{ svg.x }}" y = "{{ svg.y }}" width = "{{ svg.width }}" height="{{ svg.height }}">
     {% for bar in bars %}
-    <rect class="bar" x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.length }}" fill="{{ bar.color }}" onclick=toggle("sub_bar_1") />
+    <g id="{{ bar.name }}" parent_name="{{ bar.parent_name }}">
+    <text x="{{ prj.text_x }}" y="{{ bar.y|add:10 }}" font-size="{{ prj.text_font_size }}" textlength="{{ prj.text_length }}">
+    {{ bar.name }}
+    </text>
+    <rect class="bar" x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.length }}" fill="{{ bar.color }}" onclick=toggle("{{ bar.name }}") />
+    </g>
     {% endfor %}
     <svg>
   </body>
