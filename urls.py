@@ -11,7 +11,8 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'webtool.views.home', name='home'),
     # url(r'^webtool/', include('webtool.foo.urls')),
-    url(r'^project/', include('webtool.project.urls')),
+    url(r'^project/', include('project.urls')),
+    url(r'^web-?log/', include('weblog.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

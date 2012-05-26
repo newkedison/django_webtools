@@ -2,12 +2,11 @@ from django.conf.urls.defaults import patterns, include, url
 import os
 ROOT_DIR = os.path.dirname(__file__)
 
-urlpatterns = patterns('project.views',
+urlpatterns = patterns('weblog.views',
   url(r'^$', 'index'),
-  url(r'^test1$', 'test1'),
-  url(r'^test2$', 'test2'),
-  url(r'^bar$', 'bar'),
-  url(r'^view$', 'view_project'),
+  url(r'p/(?P<person>.*)$', 'view_person'),
+  url(r'a/(?P<action>.*)$', 'view_action'),
+  url(r'^all$', 'view_all'),
 )
 urlpatterns += patterns('django.views.static',
   url(r'^css/(?P<path>.*)$','serve', 

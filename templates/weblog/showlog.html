@@ -1,0 +1,16 @@
+<html>
+  <body>
+
+    {% for log in logs %}
+      ===================<br />
+      {{ log.action }}<br />
+      {{ log.content }}<br />
+      {{ log.remarks }}<br />
+      {{ log.date }}<br />
+      {% for p in log.people %}
+        {{ p.name }}<br />
+        {{ p.money }}<br />
+      {% endfor %}<br />
+    {% endfor %}<br />
+  </body>
+</html>
