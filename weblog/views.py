@@ -48,3 +48,6 @@ def view_remarks(request, *arg, **args):
     if len(log) == 1:
       loginfo = LogInfo(log[0], True)
   return render_to_response("weblog/showremarks.html", {'log': loginfo,})
+
+def view_discuss(request):
+  return render_to_response('weblog/discuss.html')

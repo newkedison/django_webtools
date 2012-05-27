@@ -7,10 +7,40 @@
     <a href="discuss">讨论区</a><br /><br />
     <h1>网站说明：</h1><br />
     <h2>起因：</h2><br />
-    整个项目的起因来源于2012年愚人节的一个提议，当时有人提出写一个计算双色球或者大乐透的算号程序，然后大家集资购买，每一期每个人投入一定的金钱，期望着中一个大奖。
-    于是，我写了一个软件的设计方案，然后利用空闲的时间，慢慢的开发这个软件，花了两个月的时间，到5月底软件的功能基本完成，也算是可以进入beta测试了。
-    为了记录操作的日志，而且最近刚好也弄了一个VPS，弄了两个域名，又研究过Django，所以我干脆就写了一个简陋的日志网页，反正是自己人看的，只要有需要的功能就可以了。用户体验什么的我就先不管了，等以后有心情的话再说。
+&nbsp;&nbsp;&nbsp;&nbsp;整个项目的起因来源于2012年愚人节的一个提议，当时有人提出写一个计算双色球或者大乐透的算号程序，然后大家集资购买，每一期每个人投入一定的金钱，期望着中一个大奖。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;于是，我写了一个软件的设计方案，然后利用空闲的时间，慢慢的开发这个软件，花了两个月的时间，到5月底软件的功能基本完成，也算是可以进入beta测试了。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;为了记录操作的日志，而且最近刚好也弄了一个VPS，弄了两个域名，又研究过Django，所以我干脆就写了一个简陋的日志网页，反正是自己人看的，只要有需要的功能就可以了。用户体验什么的我就先不管了，等以后有心情的话再说。<br />
     <h2>算号软件说明：</h2>
-    
+&nbsp;&nbsp;&nbsp;&nbsp;1.&nbsp;这个软件专门针对双色球来设计<br />
+&nbsp;&nbsp;&nbsp;&nbsp;2.&nbsp;软件采用Delphi7开发，选择Delphi的唯一原因是这个是我目前最熟悉的Windows下GUI程序开发工具，当然如果以后有时间的话（一般不太可能有时间的），我可能会用pyQt改写一个跨平台的版本。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;3.&nbsp;程序源码采用Mercurial进行控制，托管于<a href="https://code.google.com/p/to-be-millionaire/">google&nbsp;code</a>和<a href="https://bitbucket.org/newkedison/millionaire">bitbucket</a>，暂时没考虑用什么开源许可证，反正也不是什么牛叉程序，爱怎么用就怎么用。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;4.&nbsp;软件除了向我直接索取外，也可以从上面两个网站上下载，下载列表分别在：<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://code.google.com/p/to-be-millionaire/downloads/list">Google&nbsp;Code下载列表</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://bitbucket.org/newkedison/millionaire/downloads">Bitbucket下载列表</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;从上面的列表中选择一个版本号最大的压缩包下载即可，我一般会把最新的可执行程序放上去的。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;5.&nbsp;这个软件的设计思路，主要就是采用插件的模式，总共有两类插件，我称之为Generator和Evaluation（中文叫算号插件和评价插件）。软件会要求用户生成一个随机的数字，然后把随机数传递给算号插件，由算号插件计算出一组备选号码，多个算号插件就可以生成多组号码，然后对于每组号码，调用所有评价插件进行评价，最后选择评价值最高的一组号码，作为最终的选择。具体的实现方式，计算方法等，都在我共享的Google&nbsp;Documents里面，这里就不再详细说了。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;6.&nbsp;考虑到国际化的问题，虽然这个软件应该最多就是我们几个人自己用用，但是既然托管了，也开源了，总不能写一堆中文在里面。于是，整个软件几乎是全英文的（只有几个从我以前写的库里面摘抄出来的函数里面的注释是中文的）。我知道我的英文是体育老师教的，反正就是献丑了，应该中国人是可以看懂的，外国人就不知道了。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;7.&nbsp;当然，软件的界面当然不可能只有英文版，我找到了一个很好用的工具，很轻松的实现了多语言选择，所以在中文系统上，整个界面，包括日志文件，全部都是中文的（当然，如果插件本身用的是英文，那插件的信息就是英文的）。如果你有信心可以看懂我的Chinglish，可以自行选择成全英文版。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;8.&nbsp;关于插件，我会先写几个简单的插件，作为官方插件，随发布版本一起发布，后续的工作就需要发挥集体的智慧，大家贡献好的方法或者好的插件了。官方插件会同样开源，其他的插件是否开源，由作者自己决定，当然，强烈建议开源咯。<br />
+    <h2>本网站说明：</h2>
+&nbsp;&nbsp;&nbsp;&nbsp;1.&nbsp;这个网站是架在我买的一个VPS上面，主机在美国加利福尼亚，所以访问速度稍微慢一些，但我自己试下来反正还不是太卡，不影响使用。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;2.&nbsp;域名是用的免费<a href="http://www.dot.tk">.tk域名</a>，域名解析是用免费的<a href="http://www.namecheap.com">namecheap</a>，看起来还是比较靠谱的。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;3.&nbsp;网站开发和运行使用的主要工具有：<a href="http://httpd.apache.org">apache2</a>/<a href="http://www.python.org">python</a>/<a href="https://www.djangoproject.com">django</a>。我大概花了1天的时间，把这个网站写好，虽然很简陋吧，但是我目前想实现的功能，就是可以在线记录和查看操作日志（当然，记录是纯人工操作），另外是可以查看账户余额（这个是非实时的）。反正数据要先存起来，以后要怎么美化都行。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;4.&nbsp;网站代码也同样是开源的，用的是Git，目前托管在<a href="">Github</a>，其实里面不止这一个网站，还有另外一个我写了一半的小工具，是做项目进度可视化的，这个坑以后应该会填掉。关于开源，其实不用担心安全性的问题，因为网站采用django自己的用户权限管理体系，安全性至少比我自己控制要高多了（肯定不会有明文密码这种坑爹的事情），另外是apache的安全性也是比较高的，虽然我对其安全配置还不是很懂，但是他的默认配置应该也是很安全的。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;5.&nbsp;网站统计分析使用的是<a href="https://www.google.com/analytics/">Google&nbsp;Analytics</a>，评论使用<a href="http://www.disqus.com">Disqus</a>，又是两个很靠谱的工具。<br />
+<!-- Google Analytics -->
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-15769172-4']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+   })();
+
+ </script>
   </body>
 </html>
