@@ -1,0 +1,26 @@
+<html>
+  <body>
+    <table border="1">
+      <tr>
+        <td>时间</td>
+        <td>{{ log.date|date:"Y-m-d H:i:s" }}</td>
+      </tr>
+      <tr>
+        <td>操作者</td>
+        <td>{% for p in log.people %}{{ p.name }} {% endfor %}</td>
+      </tr>
+      <tr>
+        <td>操作</td>
+        <td>{{ log.action }}</td>
+      </tr>
+      <tr>
+        <td>内容</td>
+        <td>{{ log.content }}</td>
+      </tr>
+      <tr>
+        <td>备注</td>
+        <td>{{ log.remarks }}</td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -7,6 +7,7 @@ urlpatterns = patterns('weblog.views',
   url(r'p/(?P<person>.*)$', 'view_person'),
   url(r'a/(?P<action>.*)$', 'view_action'),
   url(r'^all$', 'view_all'),
+  url(r'^remarks/(?P<id>\d+)$', 'view_remarks'),
 )
 urlpatterns += patterns('django.views.static',
   url(r'^css/(?P<path>.*)$','serve', 

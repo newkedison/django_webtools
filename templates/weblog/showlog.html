@@ -18,8 +18,11 @@
         <td>{{ log.action }}</td>
         <td>{{ log.content }}</td>
         <td>
-          {% if log.remarks %}
-          <a href='remarks/{{ log.ID }}'>查看备注</a></td>
+          {% if log.has_remarks %}
+          <span title="{{ log.remarks }}">
+            <a href='remarks/{{ log.ID }}'>查看备注</a>
+          </span>
+        </td>
           {% else %}
           &nbsp;
           {% endif %}
