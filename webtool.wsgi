@@ -9,6 +9,5 @@ print >> sys.stderr, os.environ['DJANGO_SETTINGS_MODULE']
 import django.core.handlers.wsgi
 print >> sys.stderr, 'import ok'
 application = django.core.handlers.wsgi.WSGIHandler()
-print >> sys.stderr, 'aaaa'
 
 # vim:ft=python

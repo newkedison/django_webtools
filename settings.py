@@ -1,9 +1,11 @@
 # Django settings for webtool project.
 
-DEBUG = True
+import os
+import sys
+
+DEBUG = not os.path.exists(os.path.join(os.path.dirname(__file__), 'nodebug'))
 TEMPLATE_DEBUG = DEBUG
 
-import os
 ROOT_DIR = os.path.dirname(__file__)
 
 ADMINS = (
