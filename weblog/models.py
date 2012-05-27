@@ -17,7 +17,7 @@ class Log(models.Model):
   action = models.ForeignKey(Action)
   people = models.ManyToManyField(Person)
   content = models.CharField(max_length=1000)
-  remarks = models.TextField()
-  date = models.DateTimeField(auto_now=True, auto_now_add=True)
+  remarks = models.TextField(blank=True)
+  date = models.DateTimeField(auto_now_add=True)
   def __unicode__(self):
     return self.content

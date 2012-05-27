@@ -1,16 +1,31 @@
 <html>
   <body>
+    <table border="1">
+      <tr>
+        <td>时间</td>
+        <td>操作者</td>
+        <td>动作</td>
+        <td>说明</td>
+        <td>备注</td>
+      </tr>
 
-    {% for log in logs %}
-      ===================<br />
-      {{ log.action }}<br />
-      {{ log.content }}<br />
-      {{ log.remarks }}<br />
-      {{ log.date }}<br />
-      {% for p in log.people %}
-        {{ p.name }}<br />
-        {{ p.money }}<br />
-      {% endfor %}<br />
-    {% endfor %}<br />
+{% for log in logs %} 
+      <tr>
+        <td><span title="{{ log.date|date:"Y-m-d H:i:s" }}">
+            {{ log.date|date:"Y-m-d" }}
+            <span></td>
+        <td>{% for p in log.people %}{{ p.name }} {% endfor %}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.content }}</td>
+        <td>
+          {% if log.remarks %}
+          <a href='remarks/{{ log.ID }}'>查看备注</a></td>
+          {% else %}
+          &nbsp;
+          {% endif %}
+        </td>
+{% endfor %}
+      </tr>
+    </table>
   </body>
 </html>

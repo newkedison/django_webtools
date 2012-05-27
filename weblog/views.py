@@ -7,16 +7,18 @@ def index(request):
 
 class LogInfo():
   def __init__(self, l):
+    self.ID = l.id
     self.people = list(l.people.all())
     self.action = l.action
     self.content = l.content
-    self.ramarks = l.remarks
+    self.remarks = len(l.remarks) <> 0
     self.date = l.date
 
 def LogsToLogInfo(logs):
   log_info = []
   for log in logs:
     log_info.append(LogInfo(log))
+  log_info.sort(key=lambda l: l.date, reverse=True)
   return log_info
 
 def view_all(request):
