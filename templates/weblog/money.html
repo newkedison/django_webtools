@@ -4,36 +4,19 @@
     <a href="index">返回主页</a><br />
     <a href="all">查看所有操作日志</a><br />
     <a href="discuss">讨论区</a><br /><br />
-    <h2>操作日志</h2><br />
+    <h2>注意：</h2>
+    本页面中列出了每个人的账户中的余额，由于还没有写提交页面，所以金额的变动需要人工修改，一方面是可能出现计算错误的情况，另一个方面是更新肯定是不及时的，所以本页面中的数据仅作参考，实际数值以我自己统计的为准<br /><br />
     <table border="1">
       <tr>
-        <td>时间</td>
-        <td>操作者</td>
-        <td>动作</td>
-        <td>说明</td>
-        <td>备注</td>
+        <td>用户名</td>
+        <td>账户余额</td>
       </tr>
-
-{% for log in logs %} 
+{% for p in people %}
       <tr>
-        <td><span title="{{ log.date|date:"Y-m-d H:i:s" }}">
-            {{ log.date|date:"Y-m-d" }}
-            <span></td>
-        <td>{% for p in log.people %}{{ p.name }} {% endfor %}</td>
-        <td>{{ log.action }}</td>
-        <td>{{ log.content }}</td>
-        <td>
-          {% if log.has_remarks %}
-          <span title="{{ log.remarks }}">
-            <a href='remarks/{{ log.ID }}'>查看备注</a>
-          </span>
-        </td>
-          {% else %}
-          &nbsp;
-          {% endif %}
-        </td>
-{% endfor %}
+        <td>{{ p.name }}</td>
+        <td>{{ p.money }}</td>
       </tr>
+{% endfor %}
     </table>
 <!-- Google Analytics -->
 <script type="text/javascript">

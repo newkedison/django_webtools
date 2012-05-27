@@ -51,3 +51,7 @@ def view_remarks(request, *arg, **args):
 
 def view_discuss(request):
   return render_to_response('weblog/discuss.html')
+
+def view_money(request):
+  p = Person.objects.all()
+  return render_to_response('weblog/money.html', {'people': p,})
