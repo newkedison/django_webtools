@@ -18,9 +18,11 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
+    url(r'^$', 'views.index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^css/(?P<path>.*)$','django.views.static.serve', 
      { 'document_root': os.path.join(ROOT_DIR, 'static/css')}), 
     url(r'^js/(?P<path>.*)$','django.views.static.serve', 
      { 'document_root': os.path.join(ROOT_DIR, 'static/js')}), 
+    url(r'^robots.txt', 'views.robots'),
 )
