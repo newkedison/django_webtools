@@ -15,14 +15,14 @@
     <h2>算号软件说明：</h2>
 &nbsp;&nbsp;&nbsp;&nbsp;1.&nbsp;这个软件专门针对双色球来设计<br />
 &nbsp;&nbsp;&nbsp;&nbsp;2.&nbsp;软件采用Delphi7开发，选择Delphi的唯一原因是这个是我目前最熟悉的Windows下GUI程序开发工具，当然如果以后有时间的话（一般不太可能有时间的），我可能会用pyQt改写一个跨平台的版本。<br />
-&nbsp;&nbsp;&nbsp;&nbsp;3.&nbsp;程序源码采用Mercurial进行控制，托管于<a href="https://code.google.com/p/to-be-millionaire/" target=_blank>google&nbsp;code</a>和<a href="https://bitbucket.org/newkedison/millionaire" target=_blank>bitbucket</a>，暂时没考虑用什么开源许可证，反正也不是什么牛叉程序，爱怎么用就怎么用。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;3.&nbsp;程序源码采用<a href="http://mercurial.selenic.com" target=_blank>Mercurial</a>进行控制，托管于<a href="https://code.google.com/p/to-be-millionaire/" target=_blank>google&nbsp;code</a>和<a href="https://bitbucket.org/newkedison/millionaire" target=_blank>bitbucket</a>，暂时没考虑用什么开源许可证，反正也不是什么牛叉程序，爱怎么用就怎么用。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;4.&nbsp;软件除了向我直接索取外，也可以从上面两个网站上下载，下载列表分别在：<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="https://code.google.com/p/to-be-millionaire/downloads/list" target=_blank>Google&nbsp;Code下载列表</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="https://bitbucket.org/newkedison/millionaire/downloads" target=_blank>Bitbucket下载列表</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;从上面的列表中选择一个版本号最大的压缩包下载即可，我一般会把最新的可执行程序放上去的。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;5.&nbsp;这个软件的设计思路，主要就是采用插件的模式，总共有两类插件，我称之为Generator和Evaluation（中文叫算号插件和评价插件）。软件会要求用户生成一个随机的数字，然后把随机数传递给算号插件，由算号插件计算出一组备选号码，多个算号插件就可以生成多组号码，然后对于每组号码，调用所有评价插件进行评价，最后选择评价值最高的一组号码，作为最终的选择。具体的实现方式，计算方法等，都在我共享的Google&nbsp;Documents里面，这里就不再详细说了。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;6.&nbsp;考虑到国际化的问题，虽然这个软件应该最多就是我们几个人自己用用，但是既然托管了，也开源了，总不能写一堆中文在里面。于是，整个软件几乎是全英文的（只有几个从我以前写的库里面摘抄出来的函数里面的注释是中文的）。我知道我的英文是体育老师教的，反正就是献丑了，应该中国人是可以看懂的，外国人就不知道了。<br />
-&nbsp;&nbsp;&nbsp;&nbsp;7.&nbsp;当然，软件的界面不可能只有英文版，我找到了一个很好用的工具，很轻松的实现了多语言选择，所以在中文系统上，整个界面，包括日志文件，全部都是中文的（但是，如果插件本身用的是英文，那插件的信息就是英文的）。如果你有信心可以看懂我的Chinglish，可以自行选择成全英文版。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;7.&nbsp;当然，软件的界面不可能只有英文版，我找到了<a href="http://dxgettext.po.dk" target=_blank>一个很好用的工具</a>，很轻松的实现了多语言选择，所以在中文系统上，整个界面，包括日志文件，全部都是中文的（但是，如果插件本身用的是英文，那插件的信息就是英文的）。如果你有信心可以看懂我的Chinglish，可以自行选择成全英文版。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;8.&nbsp;关于插件，我会先写几个简单的插件，作为官方插件，随发布版本一起发布，后续的工作就需要发挥集体的智慧，大家贡献好的方法或者好的插件了。官方插件会同样开源，其他的插件是否开源，由作者自己决定，当然，强烈建议开源咯。<br />
     <h2>本网站说明：</h2>
 &nbsp;&nbsp;&nbsp;&nbsp;1.&nbsp;这个网站是架在我买的一个VPS上面，主机在美国加利福尼亚，所以访问速度稍微慢一些，但我自己试下来反正还不是太卡，不影响使用。<br />
