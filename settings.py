@@ -6,6 +6,15 @@ import sys
 DEBUG = not os.path.exists(os.path.join(os.path.dirname(__file__), 'nodebug'))
 TEMPLATE_DEBUG = DEBUG
 
+DB_path = '/home/newk/webtool/sqlite.db'
+SECRET_KEY = 'vh%lurrg$&2rx^7(xdw^wxy+w=ph#ks^$d27r(-8e%4v(su78l'
+try:
+  f = open('setting.conf', 'r')
+  DB_path = f.readline()[:-1]
+  SECRET_KEY = f.readline()[:-1]
+except IOError:
+  pass
+
 ROOT_DIR = os.path.dirname(__file__)
 
 ADMINS = (
@@ -17,7 +26,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/home/newk/webtool/sqlite.db',                      # Or path to database file if using sqlite3.
+        'NAME': DB_path,                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -90,7 +99,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'vh%lurrg$&2rx^7(xdw^wxy+w=ph#ks^$d27r(-8e%4v(su78l'
+#SECRET_KEY = 'vh%lurrg$&2rx^7(xdw^wxy+w=ph#ks^$d27r(-8e%4v(su78l'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -129,6 +138,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'project',
     'weblog',
+    'fileupload',
 )
 
 # A sample logging configuration. The only tangible logging
