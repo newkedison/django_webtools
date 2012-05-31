@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html>
-  <body style="width:800px; font-size:18px">
-    <h1>常用链接：</h1><br />
-    <a href="all">查看所有操作日志</a><br />
-    <a href="money">查看余额</a><br />
-    <a href="discuss">讨论区</a><br /><br />
+{% extends "weblog/weblog_base.html" %}
+
+{% block head_extra %}
+<style>
+  body { width: 800px; font-size: 18px}
+</style>
+{% endblock head_extra %}
+
+{% block content %}
     <h1 style="color:red">注意：</h1>
 &nbsp;&nbsp;&nbsp;&nbsp;这个网站目前处于测试阶段，计划于6月份的某一天（那个日期不能写，你懂的）才正式开始记录，在正式使用前，会把全部数据库删除重建，也就是说，这是删档公测，所以请不要保存重要信息。<br />
     <h1>网站说明：</h1><br />
@@ -30,19 +32,4 @@
 &nbsp;&nbsp;&nbsp;&nbsp;3.&nbsp;网站开发和运行使用的主要工具有：<a href="http://httpd.apache.org" target=_blank>apache2</a>/<a href="http://www.python.org" target=_blank>python</a>/<a href="https://www.djangoproject.com" target=_blank>django</a>。我大概花了1天的时间，把这个网站写好，虽然很简陋吧，但是我目前想实现的功能，就是可以在线记录和查看操作日志（当然，记录是纯人工操作），另外是可以查看账户余额（这个是非实时的）。反正数据要先存起来，以后要怎么美化都行。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;4.&nbsp;网站代码也同样是开源的，用的是Git，目前托管在<a href="https://github.com/newkedison/django_webtools" target=_blank>Github</a>，其实里面不止这一个网站，还有另外一个我写了一半的小工具，是做项目进度可视化的，这个坑以后应该会填掉。关于开源，其实不用担心安全性的问题，因为网站采用django自己的用户权限管理体系，安全性至少比我自己控制要高多了（肯定不会有明文密码这种坑爹的事情），另外是apache的安全性也是比较高的，虽然我对其安全配置还不是很懂，但是他的默认配置应该也是很安全的。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;5.&nbsp;网站统计分析使用的是<a href="https://www.google.com/analytics/" target=_blank>Google&nbsp;Analytics</a>，评论使用<a href="http://www.disqus.com" target=_blank>Disqus</a>，又是两个很靠谱的工具。<br />
-<!-- Google Analytics -->
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-15769172-4']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-   })();
-
- </script>
-  </body>
-</html>
+{% endblock content %}

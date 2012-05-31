@@ -1,9 +1,5 @@
-<html>
-  <body>
-    <h1>常用链接：</h1><br />
-    <a href="../index">返回主页</a><br />
-    <a href="../all">查看所有操作日志</a><br />
-    <a href="../discuss">讨论区</a><br /><br />
+{% extends "weblog/weblog_base.html" %}
+{% block content %}
     <table border="1">
       <tr>
         <td>时间</td>
@@ -26,19 +22,4 @@
         <td>{{ log.remarks }}</td>
       </tr>
     </table>
-<!-- Google Analytics -->
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-15769172-4']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-   })();
-
- </script>
-  </body>
-</html>
+{% endblock content %}

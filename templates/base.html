@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <title>{% block title %}我的网页工具集{% endblock title %}</title>
+    {% block meta %}
+    <meta http-equiv="charset" content="utf-8" />
+    {% endblock meta %}
+    {% block link_css %}{% endblock link_css %}
+    {% block link_js %}{% endblock link_js %}
+    {% block head_extra %}{% endblock head_extra %}
+  </head>
+  <body>
+    {% block body %}{% endblock body %}
+    {% block footer %}
+    <br /><br /><hr />
+    <span style="color:gray; font-size:10px">
+      <center>Copyright © 2012 <a href="http://newkedison.tk" target=_blank>newk</a>. All Rights Reserved.</center>
+      <center>本网页由<a href="http://newkedison.tk" target=_blank>newk</a>强力出品, 仅供熟人使用, 保留所有权利</center>
+      <center>网站开发和运行使用的主要工具有：<a href="http://httpd.apache.org" target=_blank>apache2</a>/<a href="http://www.python.org" target=_blank>python</a>/<a href="https://www.djangoproject.com" target=_blank>django</a></center>
+      <center>整个网站的代码完全开源,托管于<a href="https://github.com/newkedison/django_webtools" target=_blank>Github</a>,欢迎提出宝贵意见</center>
+    </span>
+    {% endblock footer %}
+    {% block analytics %}
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15769172-4']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+       })();
+    </script>
+    {% endblock analytics %}
+  </body>
+</html>
+

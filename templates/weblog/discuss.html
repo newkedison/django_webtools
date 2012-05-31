@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>常用链接：</h1><br />
-    <a href="index">返回主页</a><br />
-    <a href="all">查看所有操作日志</a><br />
-    <a href="money">查看余额</a><br />
+{% extends "weblog/weblog_base.html" %}
+{% block content %}
     <h1>留言板</h1><br />
 
     <div id="disqus_thread"></div>
@@ -20,20 +15,4 @@ var disqus_shortname = 'newk-webtools';
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-
-<!-- Google Analytics -->
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-15769172-4']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-   })();
-
-</script>
-  </body>
-</html>
+{% endblock content %}
