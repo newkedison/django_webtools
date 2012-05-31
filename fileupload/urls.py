@@ -5,7 +5,7 @@ ROOT_DIR = os.path.dirname(__file__)
 urlpatterns = patterns('fileupload.views',
   url(r'^(index)?$', 'index'),
   url(r'^upload$', 'upload'),
-  url(r'^success$', 'success'),
+  url(r'^success/?.*$', 'success'),
   url(r'^get/(?P<prefix>[^/]+)/(?P<filename>.*)$', 'index'),
 )
 

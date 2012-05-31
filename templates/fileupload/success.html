@@ -1,0 +1,14 @@
+{% extends "fileupload/fileupload_base.html" %}
+{% block content %}
+upload success<br />
+<br />
+upload to directory: {{ dir|default:"未知" }}<br />
+uploaded file name: {{ old_name|default:"未知" }}<br />
+saved file name: {{ new_name|default:"未知" }}<br />
+file size: {{ file_size|default:"未知" }}<br />
+directory used space: {{ dir_used|default:"0" }}MB<br />
+directory total sapce: {{ dir_total|default:"0" }}MB<br />
+<br />
+<a href="../index">go to index</a><br />
+<a href="../upload">upload another file</a>
+{% endblock content %}
