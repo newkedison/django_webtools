@@ -1,14 +1,11 @@
 {% extends "fileupload/fileupload_base.html" %}
 {% block content %}
-upload success<br />
+<h1>文件上传成功</h1><br />
 <br />
-upload to directory: {{ dir|default:"未知" }}<br />
-uploaded file name: {{ old_name|default:"未知" }}<br />
-saved file name: {{ new_name|default:"未知" }}<br />
-file size: {{ file_size|default:"未知" }}<br />
-directory used space: {{ dir_used|default:"0" }}MB<br />
-directory total sapce: {{ dir_total|default:"0" }}MB<br />
-<br />
-<a href="../index">go to index</a><br />
-<a href="../upload">upload another file</a>
+文件夹: {{ dir|default:"未知" }}<br />
+上传文件名: {{ old_name|default:"未知" }}<br />
+保存文件名: {{ new_name|default:"未知" }}<br />
+文件实际大小(Byte): {{ file_size|default:"未知" }}<br />
+文件夹已使用容量(MB): {{ dir_used|default:"0" }}<br />
+文件夹总容量(MB): {{ dir_total|default:"0" }}<br />
 {% endblock content %}
