@@ -2,12 +2,14 @@
 #encoding: utf-8
 import os
 import re
+import sys #for print >> sys.stderr, 'some log'
 import tempfile
 import datetime
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404, render
 from django.core.context_processors import csrf
+from django.core.servers.basehttp import FileWrapper
 from models import Directory, UploadFile
 
 class UploadForm(forms.Form):
@@ -17,6 +19,25 @@ class UploadForm(forms.Form):
     widget=forms.PasswordInput, help_text='该文件夹的上传密码')
   filename = forms.CharField(label='文件名', max_length=30, required=False,
     help_text='文件被下载时使用的文件名,不能和同文件夹内的其他已存在的文件重复')
+  content_type = forms.ChoiceField(label='文件类型', required=False,
+    help_text='一般选择自动检测,会根据扩展名自动判断,对于一些没有扩展名的文件,'\
+            + '而且需要在线查看的,才需要自行指定类型',
+    choices = [
+      ('', '自动检测'),
+      ('text/plain', '文本文件'),
+      ('text/html', 'HTML文件'),
+      ('text/xml', 'XML文件'),
+      ('application/pdf', 'PDF文件'),
+      ('image/*', '图片文件'),
+      ('video/*', '视频文件'),
+      ('audio/*', '音频文件'),
+      ('application/msword', 'word文件'),
+      ('application/vnd.ms-excel', 'Excel文件'),
+      ('application/vnd.ms-powerpoint', 'PPT文件'),
+      ('application/x-javascript', 'JAVA/javascript'),
+      ('application/*zip*', '压缩包'),
+      ('application/octet-stream', '其他二进制文件'),
+    ])
   auto_delete = forms.CharField(label='自动删除时间(单位:天)', initial=0,
     help_text='达到指定天数后,该文件会自动删除,设为0表示不自动删除')
   description = forms.CharField(label='文件描述', required=False,
@@ -46,8 +67,11 @@ def handle_upload_file(directory, f, name, form_data):
   size = f.size
   space = (f.size + min_block - 1) / min_block * min_block
   save_path = get_save_path(name)
+  content_type = f.content_type if form_data['content_type'] == '' \
+                                else form_data['content_type']
   UploadFile.objects.create(directory=directory, 
                             file_name=name,
+                            content_type=content_type,
                             save_path=save_path,
                             file_size=size,
                             file_space=space,
@@ -98,7 +122,8 @@ def upload(request):
 
       return HttpResponseRedirect(
         'success/?u={0:.3f}&t={1}&d={2}&fs={3}&on={4}&nn={5}'.format(
-        d.used_size / 1024.0 / 1024, d.total_size, d, f.size, f.name, name))
+        d.used_size / 1024.0 / 1024, d.total_size, d, f.size, 
+          f.name.encode('utf-8'), name.encode('utf-8')))
     else:
       return render(request, 'fileupload/upload.html', {'form': form})
   else:
@@ -166,6 +191,10 @@ def list_dir(request, *arg, **args):
         files = list(UploadFile.objects.filter(directory=d))
         for f in files:
           f.file_size = '{0:.2f}'.format(f.file_size / 1024.0)
+          if not ((f.content_type in ['text/plain', 'text/html', 'text/xml', 
+                                    'application/pdf']) or \
+             re.match('image/.*', f.content_type)):
+            f.content_type = ''
       return render_to_response('fileupload/listfiles.html', {
         'dir': d,
         'dir_used': '{:.3f}'.format(d.used_size / 1024.0 / 1024),
@@ -176,4 +205,54 @@ def list_dir(request, *arg, **args):
     return render(request, 'fileupload/list_check.html', {
       'form': form, 
       'action': args['dir'],
+    })
+
+def download(request, *arg, **args):
+  d = get_object_or_404(Directory, directory=args['dir'])
+  f = get_object_or_404(UploadFile, directory=d, 
+                        file_name=args['filename'])
+  if not os.path.exists(f.save_path.encode('utf-8')):
+    raise Http404
+  wrapper = FileWrapper(file(f.save_path.encode('utf-8')))
+  response = HttpResponse(wrapper, content_type=f.content_type)
+  response['Content-Length'] = os.path.getsize(f.save_path.encode('utf-8'))
+  x = response['Content-Length']
+  if args['method'] == 'get':
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(f.file_name)
+  return response
+
+class DeleteConfirmForm(forms.Form):
+  password = forms.CharField(label='密码', max_length=100, 
+                             widget=forms.PasswordInput)
+
+def delete(request, *arg, **args):
+  if args['dir'] == '' or args['file_id'] == '':
+    raise Http404
+  if request.method == 'POST':
+    form = DeleteConfirmForm(request.POST)
+    if form.is_valid():
+      pwd = form.cleaned_data['password']
+      try:
+        d = Directory.objects.get(directory=args['dir'])
+      except:
+        return render_to_response('fileupload/uploadfail.html',
+                                  {'error_message': '文件夹不存在或密码错误'})
+      if d.password <> pwd:
+        return render_to_response('fileupload/uploadfail.html',
+                                  {'error_message': '文件夹不存在或密码错误'})
+      try:
+        f = UploadFile.objects.get(id=args['file_id'])
+      except:
+        return render_to_response('fileupload/uploadfail.html',
+                                  {'error_message': '文件不存在'})
+      os.remove(f.save_path.encode('utf-8'))
+      f.delete()
+      form = ListDirForm(initial={'dir': d})
+      return render_to_response('fileupload/delete_success.html', {'form': form})
+  else:
+    form = DeleteConfirmForm()
+#    form.password.label = '请输入{0}的密码'.format(args['dir'])
+    return render(request, 'fileupload/delete_check.html', {
+      'form': form, 
+      'action': args['file_id'],
     })

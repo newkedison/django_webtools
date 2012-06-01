@@ -14,7 +14,7 @@
       <td>下载次数</td>
       <td>上传时间</td>
       <td>保存天数</td>
-      <td>操作</td>
+      <td colspan="3">操作</td>
     </tr>
     {% for file in files %}
     <tr>
@@ -28,7 +28,16 @@
       <td>无限期</td>
       {% endif %}
       <td>
+        {% if file.content_type != '' %}
+        <a href="../view/{{ dir.directory }}/{{ file.file_name }}">查看</a>
+        {% else %}
+        &nbsp;
+        {% endif %}
+      </td>
+      <td>
         <a href="../get/{{ dir.directory }}/{{ file.file_name }}">下载</a>
+      </td>
+      <td>
         <a href="../delete/{{ dir.directory }}/{{ file.id }}">删除</a>
       </td>
     </tr>

@@ -7,7 +7,8 @@ urlpatterns = patterns('fileupload.views',
   url(r'^upload$', 'upload'),
   url(r'^success/?.*$', 'success'),
   url(r'^list/(?P<dir>.*)$', 'list_dir'),
-  url(r'^get/(?P<prefix>[^/]+)/(?P<filename>.*)$', 'index'),
+  url(r'^(?P<method>get|view)/(?P<dir>[^/]+)/(?P<filename>.*)$', 'download'),
+  url(r'^delete/(?P<dir>[^/]+)/(?P<file_id>.*)$', 'delete'),
 )
 
 urlpatterns += patterns('django.views.static',

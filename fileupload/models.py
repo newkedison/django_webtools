@@ -22,6 +22,7 @@ class Directory(models.Model):
 class UploadFile(models.Model):
   directory = models.ForeignKey(Directory)
   file_name = models.CharField(max_length=100)
+  content_type = models.CharField(max_length=30)
   save_path = models.CharField(editable=False, max_length=1000)
   file_size = models.IntegerField(editable=False)
   file_space = models.IntegerField(editable=False)
