@@ -1,0 +1,40 @@
+{% extends "fileupload/fileupload_base.html" %}
+{% block content %}
+<ui>
+<li>文件夹:{{ dir.directory }}</li>
+<li>单个文件大小:{{ dir.file_max_size }}MB</li>
+<li>总容量:{{ dir.total_size }}MB</li>
+<li>已使用容量:{{ dir_used }}MB</li>
+</ui>
+  {% if files|length > 0 %}
+  <table border="1">
+    <tr>
+      <td>文件名</td>
+      <td>文件大小(KB)</td>
+      <td>下载次数</td>
+      <td>上传时间</td>
+      <td>保存天数</td>
+      <td>操作</td>
+    </tr>
+    {% for file in files %}
+    <tr>
+      <td><span title="{{ file.description }}">{{ file.file_name }}</span></td>
+      <td>{{ file.file_size }}</td>
+      <td>{{ file.download_count }}</td>
+      <td>{{ file.upload_date|date:"Y-m-d H:i:s" }}</td>
+      {% if file.auto_delete_days > 0 %}
+      <td>{{ file.auto_delete_days }}</td>
+      {% else %}
+      <td>无限期</td>
+      {% endif %}
+      <td>
+        <a href="../get/{{ dir.directory }}/{{ file.file_name }}">下载</a>
+        <a href="../delete/{{ dir.directory }}/{{ file.id }}">删除</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  该文件夹下面没有文件,或者该文件夹不允许查看文件列表
+  {% endif %}
+{% endblock content %}

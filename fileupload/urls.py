@@ -6,6 +6,7 @@ urlpatterns = patterns('fileupload.views',
   url(r'^(index)?$', 'index'),
   url(r'^upload$', 'upload'),
   url(r'^success/?.*$', 'success'),
+  url(r'^list/(?P<dir>.*)$', 'list_dir'),
   url(r'^get/(?P<prefix>[^/]+)/(?P<filename>.*)$', 'index'),
 )
 

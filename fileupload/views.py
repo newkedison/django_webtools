@@ -13,8 +13,8 @@ from models import Directory, UploadFile
 class UploadForm(forms.Form):
   directory = forms.CharField(label='文件夹', max_length=100, 
     help_text='文件要保存在哪一个文件夹内.注意,这个文件夹必须已存在.')
-  password = forms.CharField(label='密码', max_length=100,
-    help_text='该文件夹的上传密码')
+  password = forms.CharField(label='密码', max_length=100, 
+    widget=forms.PasswordInput, help_text='该文件夹的上传密码')
   filename = forms.CharField(label='文件名', max_length=30, required=False,
     help_text='文件被下载时使用的文件名,不能和同文件夹内的其他已存在的文件重复')
   auto_delete = forms.CharField(label='自动删除时间(单位:天)', initial=0,
@@ -140,3 +140,40 @@ def check_used(d):
     used_sum += f.file_space
   d.used_size = used_sum
   d.save()
+
+class ListDirForm(forms.Form):
+  directory = forms.CharField(label='文件夹', max_length=100,
+                             help_text='要查看的文件夹')
+  password = forms.CharField(label='密码', max_length=100, 
+                             widget=forms.PasswordInput)
+
+def list_dir(request, *arg, **args):
+  if request.method == 'POST':
+    form = ListDirForm(request.POST)
+    if form.is_valid():
+      form_data = form.cleaned_data
+      try:
+        d = Directory.objects.get(directory=form_data['directory'])
+      except:
+        return render_to_response('fileupload/uploadfail.html',
+                                  {'error_message': '文件夹不存在或密码错误'})
+      if d.password <> form_data['password']:
+        return render_to_response('fileupload/uploadfail.html',
+                                  {'error_message': '文件夹不存在或密码错误'})
+      check_used(d)
+      files = []
+      if d.allow_list:
+        files = list(UploadFile.objects.filter(directory=d))
+        for f in files:
+          f.file_size = '{0:.2f}'.format(f.file_size / 1024.0)
+      return render_to_response('fileupload/listfiles.html', {
+        'dir': d,
+        'dir_used': '{:.3f}'.format(d.used_size / 1024.0 / 1024),
+        'files': files,
+      })
+  else:
+    form = ListDirForm(initial={'directory': args['dir']})
+    return render(request, 'fileupload/list_check.html', {
+      'form': form, 
+      'action': args['dir'],
+    })
