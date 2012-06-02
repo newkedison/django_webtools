@@ -5,54 +5,13 @@ import re
 import sys #for print >> sys.stderr, 'some log'
 import tempfile
 import datetime
-from django import forms
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404, render
 from django.core.context_processors import csrf
 from django.core.servers.basehttp import FileWrapper
 from models import Directory, UploadFile
+from forms import UploadForm, ListDirForm, DeleteConfirmForm
 
-class UploadForm(forms.Form):
-  directory = forms.CharField(label='文件夹', max_length=100, 
-    help_text='文件要保存在哪一个文件夹内.注意,这个文件夹必须已存在.')
-  password = forms.CharField(label='密码', max_length=100, 
-    widget=forms.PasswordInput, help_text='该文件夹的上传密码')
-  filename = forms.CharField(label='文件名', max_length=30, required=False,
-    help_text='文件被下载时使用的文件名,不能和同文件夹内的其他已存在的文件重复'\
-    + '<br />只能是字母,数字,小数点,下划线,减号.如果留空,表示使用上传的文件名'\
-    + '<br />如果要使用中文文件名,可以先修改欲上传的文件为该名字,然后这里留空')
-  content_type = forms.ChoiceField(label='文件类型', required=False,
-    help_text='一般选择自动检测,会根据扩展名自动判断,对于一些没有扩展名的文件,'\
-            + '而且需要在线查看的,才需要自行指定类型',
-    choices = [
-      ('', '自动检测'),
-      ('text/plain', '文本文件'),
-      ('text/html', 'HTML文件'),
-      ('text/xml', 'XML文件'),
-      ('application/pdf', 'PDF文件'),
-      ('image/*', '图片文件'),
-      ('video/*', '视频文件'),
-      ('audio/*', '音频文件'),
-      ('application/msword', 'word文件'),
-      ('application/vnd.ms-excel', 'Excel文件'),
-      ('application/vnd.ms-powerpoint', 'PPT文件'),
-      ('application/x-javascript', 'JAVA/javascript'),
-      ('application/*zip*', '压缩包'),
-      ('application/octet-stream', '其他二进制文件'),
-    ])
-  auto_delete = forms.CharField(label='自动删除时间', initial=0,
-    help_text='单位:天.达到指定天数后,该文件会自动删除,设为0表示不自动删除')
-  description = forms.CharField(label='文件描述', required=False,
-    help_text='对文件的描述,可以为空', widget=forms.Textarea)
-  file = forms.FileField(label='待上传文件')
-
-  def clean_filename(self):
-    fn = self.cleaned_data.get('filename', '')
-    if fn <> '':
-      if re.match('[0-9a-zA-Z_][-0-9a-zA-Z_.]*', fn) == None:
-        raise forms.ValidationError('文件名不合法(只能由数字,字母,下划线组成)')
-    return fn
- 
 def get_save_path(file_name):
   _, filename = os.path.split(file_name)
   prefix, suffix = os.path.splitext(filename)
@@ -152,7 +111,6 @@ def success(request):
 def check_used(d):
   files = UploadFile.objects.filter(directory=d)
   used_sum = 0
-  import sys
   for f in files:
     if f.auto_delete_days > 0:
       upload_date = f.upload_date
@@ -167,11 +125,6 @@ def check_used(d):
     used_sum += f.file_space
   d.used_size = used_sum
   d.save()
-
-class ListDirForm(forms.Form):
-  directory = forms.CharField(label='要查看的文件夹名称', max_length=100)
-  password = forms.CharField(label='请输入该文件的密码', max_length=100, 
-                             widget=forms.PasswordInput)
 
 def list_dir(request, *arg, **args):
   if request.method == 'POST':
@@ -228,10 +181,6 @@ def download(request, *arg, **args):
   f.download_count += 1
   f.save()
   return response
-
-class DeleteConfirmForm(forms.Form):
-  password = forms.CharField(label='请输入文件夹的密码', max_length=100, 
-                             widget=forms.PasswordInput)
 
 def delete(request, *arg, **args):
   if args['dir'] == '' or args['file_id'] == '':
