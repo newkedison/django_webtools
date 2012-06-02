@@ -6,9 +6,6 @@ ul, ol, dl, address {
 body {
   background: #fff;
 }
-p {
-  text-align: center;
-}  
 a:link {
   color: #3429e0;
   text-decoration: none;
