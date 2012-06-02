@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     # url(r'^webtool/', include('webtool.foo.urls')),
     url(r'^project/', include('project.urls')),
     url(r'^web-?log/', include('weblog.urls')),
-    url(r'^fileupload/', include('fileupload.urls')),
+    url(r'^files/', include('fileupload.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

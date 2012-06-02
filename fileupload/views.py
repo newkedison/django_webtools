@@ -214,12 +214,19 @@ def download(request, *arg, **args):
                         file_name=args['filename'])
   if not os.path.exists(f.save_path.encode('utf-8')):
     raise Http404
+  if f.auto_delete_days > 0 and \
+     f.upload_date + datetime.timedelta(days=f.auto_delete_days) \
+     < datetime.datetime.now():
+    check_used(d)
+    raise Http404
   wrapper = FileWrapper(file(f.save_path.encode('utf-8')))
   response = HttpResponse(wrapper, content_type=f.content_type)
   response['Content-Length'] = os.path.getsize(f.save_path.encode('utf-8'))
   x = response['Content-Length']
   if args['method'] == 'get':
     response['Content-Disposition'] = 'attachment; filename={0}'.format(f.file_name)
+  f.download_count += 1
+  f.save()
   return response
 
 class DeleteConfirmForm(forms.Form):
@@ -258,3 +265,6 @@ def delete(request, *arg, **args):
       'form': form, 
       'action': args['file_id'],
     })
+
+def discuss(request):
+  return render_to_response('fileupload/discuss.html')
