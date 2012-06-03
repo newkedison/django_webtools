@@ -1,0 +1,14 @@
+{% extends "fileupload/fileupload_base.html" %}
+{% block content %}
+<form action="{{ action }}" method="post">
+  {% csrf_token %}
+  <table border="1" border-width="1">
+    <tbody>
+      {{ form.as_table }}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="2"><input type="submit" value="查看文件夹" /></td></tr>
+    </tfoot>
+  </table>
+</form>
+{% endblock content %}

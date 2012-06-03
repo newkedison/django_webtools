@@ -10,7 +10,7 @@ from django.shortcuts import render_to_response, get_object_or_404, render
 from django.core.context_processors import csrf
 from django.core.servers.basehttp import FileWrapper
 from models import Directory, UploadFile
-from forms import UploadForm, ListDirForm, DeleteConfirmForm
+from forms import UploadForm, DirPasswordForm, DeleteConfirmForm
 
 def get_save_path(file_name):
   _, filename = os.path.split(file_name)
@@ -127,39 +127,33 @@ def check_used(d):
   d.save()
 
 def list_dir(request, *arg, **args):
-  if request.method == 'POST':
-    form = ListDirForm(request.POST)
-    if form.is_valid():
-      form_data = form.cleaned_data
-      try:
-        d = Directory.objects.get(directory=form_data['directory'])
-      except:
-        return render_to_response('fileupload/uploadfail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
-      if d.password <> form_data['password']:
-        return render_to_response('fileupload/uploadfail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
-      check_used(d)
-      files = []
-      if d.allow_list:
-        files = list(UploadFile.objects.filter(directory=d))
-        for f in files:
-          f.file_size = '{0:.2f}'.format(f.file_size / 1024.0)
-          if not ((f.content_type in ['text/plain', 'text/html', 'text/xml', 
-                                    'application/pdf']) or \
-             re.match('image/.*', f.content_type)):
-            f.content_type = ''
-      return render_to_response('fileupload/listfiles.html', {
-        'dir': d,
-        'dir_used': '{:.3f}'.format(d.used_size / 1024.0 / 1024),
-        'files': files,
-      })
-  else:
-    form = ListDirForm(initial={'directory': args['dir']})
-    return render(request, 'fileupload/list_check.html', {
-      'form': form, 
-      'action': args['dir'],
-    })
+  s_dir = request.session.get('dir', '')
+  if args['dir'] == '' and s_dir == '':
+    return HttpResponseRedirect('/files/check')
+  if args['dir'] <> '' and s_dir <> args['dir']:
+    return HttpResponseRedirect('/files/check')
+  if args['dir'] == '':
+    return HttpResponseRedirect('/files/list/{0}'.format(s_dir))
+
+  d = get_object_or_404(Directory, directory=s_dir)
+  if request.session.get('check', '') <> d.password:
+    return HttpResponseRedirect('/files/check')
+
+  check_used(d)
+  files = []
+  if d.allow_list:
+    files = list(UploadFile.objects.filter(directory=d))
+    for f in files:
+      f.file_size = '{0:.2f}'.format(f.file_size / 1024.0)
+      if not ((f.content_type in ['text/plain', 'text/html', 'text/xml', 
+                                'application/pdf']) or \
+         re.match('image/.*', f.content_type)):
+        f.content_type = ''
+  return render_to_response('fileupload/listfiles.html', {
+    'dir': d,
+    'dir_used': '{:.3f}'.format(d.used_size / 1024.0 / 1024),
+    'files': files,
+  })
 
 def download(request, *arg, **args):
   d = get_object_or_404(Directory, directory=args['dir'])
@@ -192,24 +186,22 @@ def delete(request, *arg, **args):
       try:
         d = Directory.objects.get(directory=args['dir'])
       except:
-        return render_to_response('fileupload/uploadfail.html',
+        return render_to_response('fileupload/fail.html',
                                   {'error_message': '文件夹不存在或密码错误'})
       if d.password <> pwd:
-        return render_to_response('fileupload/uploadfail.html',
+        return render_to_response('fileupload/fail.html',
                                   {'error_message': '文件夹不存在或密码错误'})
       try:
         f = UploadFile.objects.get(id=args['file_id'])
       except:
-        return render_to_response('fileupload/uploadfail.html',
+        return render_to_response('fileupload/fail.html',
                                   {'error_message': '文件不存在'})
       os.remove(f.save_path.encode('utf-8'))
       f.delete()
-      form = ListDirForm(initial={'dir': d})
       return render(request, 'fileupload/delete_success.html', 
-                                {'form': form})
+                                {'url': '/files/list/{0}'.format(d.directory)})
   else:
     form = DeleteConfirmForm()
-#    form.password.label = '请输入{0}的密码'.format(args['dir'])
     return render(request, 'fileupload/delete_check.html', {
       'form': form, 
       'action': args['file_id'],
@@ -217,3 +209,34 @@ def delete(request, *arg, **args):
 
 def discuss(request):
   return render_to_response('fileupload/discuss.html')
+
+def check(request, *arg, **args):
+  next = request.GET.get('next', '')
+  if request.method == 'POST':
+    form = DirPasswordForm(request.POST)
+    if form.is_valid():
+      form_data = form.cleaned_data
+      try:
+        d = Directory.objects.get(directory=form_data['directory'])
+      except:
+        return render_to_response('fileupload/fail.html',
+                                  {'error_message': '文件夹不存在或密码错误'})
+      if d.password <> form_data['password']:
+        return render_to_response('fileupload/fail.html',
+                                  {'error_message': '文件夹不存在或密码错误'})
+      request.session['dir'] = d.directory
+      request.session['check'] = d.password
+      request.session.set_expiry(0)
+      if next <> '':
+        return HttpResponseRedirect(next)
+      else:
+        return HttpResponseRedirect('/files/list/{0}'.format(d.directory))
+  else:
+    form = DirPasswordForm()
+  return render(request, 'fileupload/check.html', {
+    'form': form, 
+    'action': 'check/?next={0}'.format(next),
+  })
+
+
+

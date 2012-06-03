@@ -37,7 +37,7 @@ class UploadForm(forms.Form):
     help_text='对文件的描述,可以为空', widget=forms.Textarea)
   file = forms.FileField(label='待上传文件')
 
-class ListDirForm(forms.Form):
+class DirPasswordForm(forms.Form):
   directory = forms.CharField(label='要查看的文件夹名称', max_length=100)
   password = forms.CharField(label='请输入该文件的密码', max_length=100, 
                              widget=forms.PasswordInput)
