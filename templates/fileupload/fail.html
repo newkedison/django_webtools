@@ -2,7 +2,9 @@
 {% block content %}
 <h1>操作失败!</h1>
 <br />
+{% if error_message != '' %}
 <h2>
 失败原因: {{ error_message }}
 </h2>
+{% endif %}
 {% endblock content %}

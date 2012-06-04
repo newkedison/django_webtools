@@ -35,16 +35,16 @@
         {% endif %}
         <td>
           {% if file.content_type != '' %}
-          <a href="../view/{{ dir.directory }}/{{ file.file_name }}">查看</a>
+          <a href="../../view/{{ dir.directory }}/{{ file.file_name }}">查看</a>
           {% else %}
           &nbsp;
           {% endif %}
         </td>
         <td>
-          <a href="../get/{{ dir.directory }}/{{ file.file_name }}">下载</a>
+          <a href="../../get/{{ dir.directory }}/{{ file.file_name }}">下载</a>
         </td>
         <td>
-          <a href="../delete/{{ dir.directory }}/{{ file.id }}">删除</a>
+          <a href="../../delete/{{ dir.directory }}/{{ file.id }}">删除</a>
         </td>
       </tr>
       {% endfor %}

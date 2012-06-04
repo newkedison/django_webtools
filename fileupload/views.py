@@ -48,7 +48,8 @@ def handle_upload_file(directory, f, name, form_data):
   directory.save()
 
 def index(request, *arg, **args):
-  return render_to_response('fileupload/index.html')
+  return render_to_response('fileupload/index.html',
+        {'login_dir': request.session.get('dir', ''), })
 
 def upload(request):
   if request.method == 'POST':
@@ -58,38 +59,34 @@ def upload(request):
       try:
         d = Directory.objects.get(directory=form_data['directory'])
       except:
-        return render_to_response('fileupload/uploadfail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
+        return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
       if d.password <> form_data['password']:
-        return render_to_response('fileupload/uploadfail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
+        return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
       f = request.FILES['file']
       name = form_data['filename'] if form_data['filename'] <> '' else f.name
       if UploadFile.objects.filter(directory=d, file_name=name).count() <> 0:
-        return render_to_response('fileupload/uploadfail.html',
-                                  {'error_message': '该文件名已存在'})
+        return HttpResponseRedirect('../failed/?e=' + '该文件名已存在')
       if f.size > d.file_max_size * 1024 * 1024:
-        return render_to_response('fileupload/uploadfail.html',
-                    {'error_message': '文件大小超过文件夹允许单个文件的上限'})
+        return HttpResponseRedirect('../failed/?e=' \
+                                    + '文件大小超过文件夹允许单个文件的上限')
       check_used(d)
       if f.size + d.used_size > d.total_size * 1024 * 1024:
-        return render_to_response('fileupload/uploadfail.html',
-                    {'error_message': '文件夹已满'})
+        return HttpResponseRedirect('../failed/?e=' + '文件夹已满')
       try:
         handle_upload_file(d, f, name, form_data)
       except:
-        return render_to_response('fileupload/uploadfail.html',
-                    {'error_message': '保存文件失败'})
+        return HttpResponseRedirect('../failed/?e=' + '保存文件失败')
 
       return HttpResponseRedirect(
-        'success/?u={0:.3f}&t={1}&d={2}&fs={3}&on={4}&nn={5}'.format(
+        '../success/?u={0:.3f}&t={1}&d={2}&fs={3}&on={4}&nn={5}'.format(
         d.used_size / 1024.0 / 1024, d.total_size, d, f.size, 
           f.name.encode('utf-8'), name.encode('utf-8')))
-    else:
-      return render(request, 'fileupload/upload.html', {'form': form})
   else:
     form = UploadForm()
-    return render(request, 'fileupload/upload.html', {'form': form})
+  return render(request, 'fileupload/upload.html', 
+                {'form': form,
+                 'login_dir': request.session.get('dir', ''),
+                })
 
 def success(request):
   dir_used = request.GET.get('u', '')
@@ -106,6 +103,14 @@ def success(request):
     'file_size': file_size,
     'dir_used': dir_used,
     'dir_total': dir_total,
+    'login_dir': request.session.get('dir', ''),
+  })
+
+def failed(request):
+  error = request.GET.get('e', '')
+  return render_to_response('fileupload/fail.html', {
+    'error_message': error,
+    'login_dir': request.session.get('dir',''),
   })
 
 def check_used(d):
@@ -128,11 +133,14 @@ def check_used(d):
 
 def list_dir(request, *arg, **args):
   s_dir = request.session.get('dir', '')
-  if args['dir'] == '' and s_dir == '':
+  a_dir = args.get('dir', '')
+  if not a_dir:
+    a_dir = ''
+  if a_dir == '' and s_dir == '':
     return HttpResponseRedirect('/files/check')
-  if args['dir'] <> '' and s_dir <> args['dir']:
+  if a_dir <> '' and s_dir <> a_dir:
     return HttpResponseRedirect('/files/check')
-  if args['dir'] == '':
+  if a_dir == '':
     return HttpResponseRedirect('/files/list/{0}'.format(s_dir))
 
   d = get_object_or_404(Directory, directory=s_dir)
@@ -153,6 +161,7 @@ def list_dir(request, *arg, **args):
     'dir': d,
     'dir_used': '{:.3f}'.format(d.used_size / 1024.0 / 1024),
     'files': files,
+    'login_dir': request.session.get('dir', ''),
   })
 
 def download(request, *arg, **args):
@@ -186,29 +195,30 @@ def delete(request, *arg, **args):
       try:
         d = Directory.objects.get(directory=args['dir'])
       except:
-        return render_to_response('fileupload/fail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
+        return HttpResponseRedirect('../../../failed/?e=' \
+                                    + '文件夹不存在或密码错误')
       if d.password <> pwd:
-        return render_to_response('fileupload/fail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
+        return HttpResponseRedirect('../../../failed/?e=' \
+                                    + '文件夹不存在或密码错误')
       try:
         f = UploadFile.objects.get(id=args['file_id'])
       except:
-        return render_to_response('fileupload/fail.html',
-                                  {'error_message': '文件不存在'})
+        return HttpResponseRedirect('../../../failed/?e=' + '文件不存在')
       os.remove(f.save_path.encode('utf-8'))
       f.delete()
       return render(request, 'fileupload/delete_success.html', 
-                                {'url': '/files/list/{0}'.format(d.directory)})
+                                {'url': '../../../list/{0}'.format(d.directory)})
   else:
     form = DeleteConfirmForm()
-    return render(request, 'fileupload/delete_check.html', {
-      'form': form, 
-      'action': args['file_id'],
-    })
+  return render(request, 'fileupload/delete_check.html', {
+    'form': form, 
+    'action': '../' + args['file_id'],
+  })
 
 def discuss(request):
-  return render_to_response('fileupload/discuss.html')
+  return render_to_response('fileupload/discuss.html', {
+    'login_dir': request.session.get('dir', ''),
+  })
 
 def check(request, *arg, **args):
   next = request.GET.get('next', '')
@@ -219,23 +229,21 @@ def check(request, *arg, **args):
       try:
         d = Directory.objects.get(directory=form_data['directory'])
       except:
-        return render_to_response('fileupload/fail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
+        return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
       if d.password <> form_data['password']:
-        return render_to_response('fileupload/fail.html',
-                                  {'error_message': '文件夹不存在或密码错误'})
+        return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
       request.session['dir'] = d.directory
       request.session['check'] = d.password
       request.session.set_expiry(0)
-      if next <> '':
-        return HttpResponseRedirect(next)
-      else:
-        return HttpResponseRedirect('/files/list/{0}'.format(d.directory))
+      if next == '':
+        next = '../list/'
+      return HttpResponseRedirect(next)
   else:
     form = DirPasswordForm()
   return render(request, 'fileupload/check.html', {
     'form': form, 
-    'action': 'check/?next={0}'.format(next),
+    'action': './?next={0}'.format(next) if next <> '' else '.',
+    'login_dir': request.session.get('dir', ''),
   })
 
 

@@ -25,5 +25,5 @@ urlpatterns = patterns('',
      { 'document_root': os.path.join(ROOT_DIR, 'static/css')}), 
     url(r'^js/(?P<path>.*)$','django.views.static.serve', 
      { 'document_root': os.path.join(ROOT_DIR, 'static/js')}), 
-    url(r'^robots.txt', 'views.robots'),
+    url(r'^robots.txt$', 'views.robots'),
 )

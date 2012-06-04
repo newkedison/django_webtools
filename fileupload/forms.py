@@ -35,7 +35,8 @@ class UploadForm(forms.Form):
     help_text='单位:天.达到指定天数后,该文件会自动删除,设为0表示不自动删除')
   description = forms.CharField(label='文件描述', required=False,
     help_text='对文件的描述,可以为空', widget=forms.Textarea)
-  file = forms.FileField(label='待上传文件')
+  file = forms.FileField(label='待上传文件', 
+    help_text='注意:文件大小不能超过文件夹允许的单个文件大小,也不能超过100MB')
 
 class DirPasswordForm(forms.Form):
   directory = forms.CharField(label='要查看的文件夹名称', max_length=100)
