@@ -1,11 +1,43 @@
 #encoding: utf-8
 from django.db import models
+import random
+from django.utils.hashcompat import md5_constructor, sha_constructor
+from django.utils.encoding import smart_str
+from django.utils.crypto import constant_time_compare
+
+def check_password(raw_password, enc_password):
+  try:
+    algo, salt, hsh = enc_password.split('$')
+  except ValueError:
+    return False
+  return constant_time_compare(hsh, get_hexdigest(algo, salt, raw_password))
+
+def get_hexdigest(algorithm, salt, raw_password):
+  """
+  Returns a string of the hexdigest of the given plaintext password and salt
+  using the given algorithm ('md5', 'sha1' or 'crypt').
+  """
+  raw_password, salt = smart_str(raw_password), smart_str(salt)
+  if algorithm == 'crypt':
+    try:
+      import crypt
+    except ImportError:
+      raise ValueError('"crypt" password algorithm not supported in this environment')
+    return crypt.crypt(raw_password, salt)
+
+  if algorithm == 'md5':
+    return md5_constructor(salt + raw_password).hexdigest()
+  elif algorithm == 'sha1':
+    return sha_constructor(salt + raw_password).hexdigest()
+  raise ValueError("Got unknown password algorithm type in password.")
 
 class Directory(models.Model):
-  directory = models.CharField(max_length=100, verbose_name='保存路径', 
+  directory = models.CharField(max_length=100, verbose_name='文件夹名称', 
     help_text='用于将上传文件分类,还可以根据需要限制容量')
   password = models.CharField(max_length=100, verbose_name='上传密码',
-    help_text='必须输入正确的密码,才能允许上传,注意,下载时不需要密码')
+    help_text='必须输入正确的密码,才能允许上传,<br />注意:<br />' \
+            + '1.下载时不需要密码<br />'\
+            + '2.如果要修改密码,直接替换原来的内容,保存时会自动加密')
   file_max_size = models.IntegerField(default=100, 
     verbose_name='最大文件大小(单位:MB)',
     help_text='上传的文件不允许超过此大小, 注意:此数值不能超过100MB')
@@ -18,6 +50,22 @@ class Directory(models.Model):
   
   def __unicode__(self):
     return self.directory
+
+  def set_password(self, raw_password):
+    if raw_password is None:
+      self.password = '!'
+    else:
+      algo = 'sha1'
+      a = random.random()
+      b = str(a)
+      c = get_hexdigest(algo, str(a), b)
+      d = c[:5]
+      salt = get_hexdigest(algo, str(random.random()), str(random.random()))[:5]
+      hsh = get_hexdigest(algo, salt, raw_password)
+      self.password = '%s$%s$%s' % (algo, salt, hsh)
+
+  def check_password(self, raw_password):
+    return check_password(raw_password, self.password)
 
 class UploadFile(models.Model):
   directory = models.ForeignKey(Directory)

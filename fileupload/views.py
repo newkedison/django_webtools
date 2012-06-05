@@ -11,41 +11,7 @@ from django.core.context_processors import csrf
 from django.core.servers.basehttp import FileWrapper
 from models import Directory, UploadFile
 from forms import UploadForm, DirPasswordForm, DeleteConfirmForm
-
-def get_save_path(file_name):
-  _, filename = os.path.split(file_name)
-  prefix, suffix = os.path.splitext(filename)
-  path = os.path.join(os.path.dirname(__file__), 'files').encode('utf-8')
-  if not os.path.exists(path):
-    os.makedirs(path)
-  suffix = suffix.encode('utf-8')
-  prefix = prefix.encode('utf-8')
-  _, filename = tempfile.mkstemp(suffix, prefix+"_", path)
-  return filename
-
-def handle_upload_file(directory, f, name, form_data):
-  min_block = 4 * 1024
-  size = f.size
-  space = (f.size + min_block - 1) / min_block * min_block
-  save_path = get_save_path(name)
-  content_type = f.content_type if form_data['content_type'] == '' \
-                                else form_data['content_type']
-  UploadFile.objects.create(directory=directory, 
-                            file_name=name,
-                            content_type=content_type,
-                            save_path=save_path,
-                            file_size=size,
-                            file_space=space,
-                            download_count=0,
-                            description=form_data['description'],
-                            auto_delete_days=form_data['auto_delete'],
-                           )
-  destination = open(save_path, 'wb+')
-  for chunk in f.chunks():
-    destination.write(chunk)
-  destination.close()
-  directory.used_size += space
-  directory.save()
+from util import get_save_path, handle_upload_file, check_used
 
 def index(request, *arg, **args):
   return render_to_response('fileupload/index.html',
@@ -60,7 +26,7 @@ def upload(request):
         d = Directory.objects.get(directory=form_data['directory'])
       except:
         return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
-      if d.password <> form_data['password']:
+      if not d.check_password(form_data['password']):
         return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
       f = request.FILES['file']
       name = form_data['filename'] if form_data['filename'] <> '' else f.name
@@ -112,24 +78,6 @@ def failed(request):
     'error_message': error,
     'login_dir': request.session.get('dir',''),
   })
-
-def check_used(d):
-  files = UploadFile.objects.filter(directory=d)
-  used_sum = 0
-  for f in files:
-    if f.auto_delete_days > 0:
-      upload_date = f.upload_date
-      if upload_date + datetime.timedelta(days=f.auto_delete_days) \
-         < datetime.datetime.now():
-        print >> sys.stderr, 'remove uploaded file {0}'.format(f.save_path), \
-            'uploaded when {0} and expired time is {1} days'.format(upload_date,
-                                                             f.auto_delete_days)
-        os.remove(f.save_path)
-        f.delete()
-        continue
-    used_sum += f.file_space
-  d.used_size = used_sum
-  d.save()
 
 def list_dir(request, *arg, **args):
   s_dir = request.session.get('dir', '')
@@ -197,7 +145,7 @@ def delete(request, *arg, **args):
       except:
         return HttpResponseRedirect('../../../failed/?e=' \
                                     + '文件夹不存在或密码错误')
-      if d.password <> pwd:
+      if not d.check_password(pwd):
         return HttpResponseRedirect('../../../failed/?e=' \
                                     + '文件夹不存在或密码错误')
       try:
@@ -207,12 +155,14 @@ def delete(request, *arg, **args):
       os.remove(f.save_path.encode('utf-8'))
       f.delete()
       return render(request, 'fileupload/delete_success.html', 
-                                {'url': '../../../list/{0}'.format(d.directory)})
+                              {'url': '../../../list/{0}/'.format(d.directory), 
+                               'login_dir': request.session.get('dir', ''),})
   else:
     form = DeleteConfirmForm()
   return render(request, 'fileupload/delete_check.html', {
     'form': form, 
-    'action': '../' + args['file_id'],
+    'action': '../' + args['file_id'] + '/',
+    'login_dir': request.session.get('dir', ''),
   })
 
 def discuss(request):
@@ -230,7 +180,8 @@ def check(request, *arg, **args):
         d = Directory.objects.get(directory=form_data['directory'])
       except:
         return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
-      if d.password <> form_data['password']:
+      if not d.check_password(form_data['password']):
+#      if d.password <> form_data['password']:
         return HttpResponseRedirect('../failed/?e=' + '文件夹不存在或密码错误')
       request.session['dir'] = d.directory
       request.session['check'] = d.password
