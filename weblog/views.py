@@ -67,7 +67,7 @@ def money_manage(request):
       elif action == 'addall':
         change_money(people, money / len(people), "返奖")
       elif action == 'suball':
-        change_money(people, money / len(people), "购买")
+        change_money(people, money / len(people) * -1, "购买")
       else:
         raise Http404
       return HttpResponseRedirect('../success/')
