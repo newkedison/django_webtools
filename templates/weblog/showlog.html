@@ -1,34 +1,50 @@
 {% extends "weblog/weblog_base.html" %}
 {% block content %}
     <h2>操作日志</h2><br />
-    <table border="1">
-      <tr>
-        <td>时间</td>
-        <td>操作者</td>
-        <td>动作</td>
-        <td>说明</td>
-        <td>备注</td>
-      </tr>
+    {% if logs|length == 0 %}
+    <h3>很抱歉,当前没有符合要求的日志记录</h3>
+    {% else %}
+    <table>
+      <thead>
+        <tr>
+          <th>时间</th>
+          <th>操作者</th>
+          <th>动作</th>
+          <th>说明</th>
+          <th>备注</th>
+        </tr>
+      </thead>
 
+      <tbody>
 {% for log in logs %} 
-      <tr>
-        <td><span title="{{ log.date|date:"Y-m-d H:i:s" }}">
-            {{ log.date|date:"Y-m-d" }}
-            <span></td>
-        <td>{% for p in log.people %}{{ p.name }} {% endfor %}</td>
-        <td>{{ log.action }}</td>
-        <td>{{ log.content }}</td>
-        <td>
-          {% if log.has_remarks %}
-          <span title="{{ log.remarks }}">
-            <a href='remarks/{{ log.ID }}'>查看备注</a>
-          </span>
-        </td>
-          {% else %}
-          &nbsp;
-          {% endif %}
-        </td>
+        <tr>
+          <td>
+            <span title="{{ log.date|date:"Y-m-d H:i:s" }}">
+              {{ log.date|date:"Y-m-d" }}
+            <span>
+            </td>
+          <td>
+            {% for p in log.people %}
+            <a href="./?p={{p.id}}" 
+              title="只查看{{ p.name }}的记录">{{ p.name }}</a> 
+            {% endfor %}
+          </td>
+          <td><a href="./?a={{log.action_id}}" 
+              title="只查看{{ log.action }}的记录">{{ log.action }}</a></td>
+          <td>{{ log.content }}</td>
+          <td>
+            {% if log.has_remarks %}
+            <span title="{{ log.remarks }}">
+              <a href='remarks/{{ log.ID }}'>查看备注</a>
+            </span>
+          </td>
+            {% else %}
+            &nbsp;
+            {% endif %}
+          </td>
+        </tr>
 {% endfor %}
-      </tr>
+      </tbody>
     </table>
+    {% endif %}
 {% endblock content %}

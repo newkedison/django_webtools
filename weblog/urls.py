@@ -3,14 +3,13 @@ import os
 ROOT_DIR = os.path.dirname(__file__)
 
 urlpatterns = patterns('weblog.views',
-  url(r'^$', 'index'),
-  url(r'^index$', 'index'),
-  url(r'^p/(?P<person>.*)$', 'view_person'),
-  url(r'^a/(?P<action>.*)$', 'view_action'),
-  url(r'^all$', 'view_all'),
-  url(r'^remarks/(?P<id>\d+)$', 'view_remarks'),
-  url(r'^discuss$', 'view_discuss'),
-  url(r'^money$', 'view_money'),
+  url(r'^(index/)?$', 'index'),
+  url(r'^all/$', 'view_all'),
+  url(r'^remarks/(?P<id>\d+)/$', 'view_remarks'),
+  url(r'^discuss/$', 'view_discuss'),
+  url(r'^money/$', 'view_money'),
+  url(r'^money_manage/$', 'money_manage'),
+  url(r'^success/$', 'success'),
 )
 urlpatterns += patterns('django.views.static',
   url(r'^css/(?P<path>.*)$','serve', 

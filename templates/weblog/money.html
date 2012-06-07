@@ -1,17 +1,19 @@
 {% extends "weblog/weblog_base.html" %}
 {% block content %}
-    <h2>注意：</h2>
-    本页面中列出了每个人的账户中的余额，由于还没有写提交页面，所以金额的变动需要人工修改，一方面是可能出现计算错误的情况，另一个方面是更新肯定是不及时的，所以本页面中的数据仅作参考，实际数值以我自己统计的为准<br /><br />
-    <table border="1">
-      <tr>
-        <td>用户名</td>
-        <td>账户余额</td>
-      </tr>
+    <table>
+      <thead>
+        <tr>
+          <th>用户名</th>
+          <th>账户余额</th>
+        </tr>
+      </thead>
+      <tbody>
 {% for p in people %}
-      <tr>
-        <td>{{ p.name }}</td>
-        <td>{{ p.money }}</td>
-      </tr>
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{{ p.money }}</td>
+        </tr>
 {% endfor %}
+      </tbody>
     </table>
 {% endblock content %}
