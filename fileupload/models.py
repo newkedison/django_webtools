@@ -1,7 +1,7 @@
 #encoding: utf-8
 from django.db import models
 import random
-from django.utils.hashcompat import md5_constructor, sha_constructor
+import hashlib
 from django.utils.encoding import smart_str
 from django.utils.crypto import constant_time_compare
 
@@ -26,9 +26,9 @@ def get_hexdigest(algorithm, salt, raw_password):
     return crypt.crypt(raw_password, salt)
 
   if algorithm == 'md5':
-    return md5_constructor(salt + raw_password).hexdigest()
+    return hashlib.md5(salt + raw_password).hexdigest()
   elif algorithm == 'sha1':
-    return sha_constructor(salt + raw_password).hexdigest()
+    return hashlib.sha1(salt + raw_password).hexdigest()
   raise ValueError("Got unknown password algorithm type in password.")
 
 class Directory(models.Model):

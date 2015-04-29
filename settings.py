@@ -3,11 +3,13 @@
 import os
 import sys
 
-DEBUG = not os.path.exists(os.path.join(os.path.dirname(__file__), 'nodebug'))
+
+ROOT_DIR = os.path.dirname(__file__)
+DEBUG = not os.path.exists(os.path.join(ROOT_DIR, 'nodebug'))
 TEMPLATE_DEBUG = DEBUG
 
-DB_path = '/home/newk/webtool/sqlite.db'
-SECRET_KEY = 'vh%lurrg$&2rx^7(xdw^wxy+w=ph#ks^$d27r(-8e%4v(su78l'
+DB_path = os.path.join(ROOT_DIR, 'sqlite.db')
+SECRET_KEY = 'set your SECRET KEY in the seconde line of setting.conf'
 try:
   f = open('setting.conf', 'r')
   DB_path = f.readline()[:-1]
@@ -15,7 +17,6 @@ try:
 except IOError:
   pass
 
-ROOT_DIR = os.path.dirname(__file__)
 
 ADMINS = (
     ('newk', 'admin@newkedison.tk'),
@@ -45,7 +46,7 @@ TIME_ZONE = 'Asia/Shanghai'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'zh-cn'
+LANGUAGE_CODE = 'zh-hans'
 
 SITE_ID = 1
 
@@ -70,7 +71,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(ROOT_DIR, "static/")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -82,13 +83,13 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, '/project/static/'),
-    os.path.join(ROOT_DIR, '/weblog/static/'),
-)
+# STATICFILES_DIRS = (
+#     # Put strings here, like "/home/html/static" or "C:/www/django/static".
+#     # Always use forward slashes, even on Windows.
+#     # Don't forget to use absolute paths, not relative paths.
+#     os.path.join(ROOT_DIR, '/project/static/'),
+#     os.path.join(ROOT_DIR, '/weblog/static/'),
+# )
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -150,6 +151,13 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
+        'applogfile': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(ROOT_DIR, 'error.log'),
+            'maxBytes': 1024*1024*15, # 15MB
+            'backupCount': 10,
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
@@ -157,7 +165,7 @@ LOGGING = {
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['applogfile'],
             'level': 'ERROR',
             'propagate': True,
         },
