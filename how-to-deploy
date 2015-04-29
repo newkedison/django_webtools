@@ -1,0 +1,94 @@
+# 部署方法
+
+### 运行环境
+
+最基本的肯定是需要python和django了, 目前使用的版本是Python 2.7.6和Django 1.8,
+以前的版本是否能支持就不知道了
+
+如果测试的话, 用django自带的简易服务器(python manager.py runserver 8080)就可以
+测试了, 但是在真正使用的时候, 还是需要一个更加专业的Web Server的.
+
+最著名的就两个----apache和nginx, 以前这个项目我是用apache部署的, 说不上难,
+但是也不简单,对于第一次弄还是有不少坑的, 但是时间太久, 具体是什么坑也忘差不多了,
+印象最深刻的就是一定要把路径弄对, 一方面是apache里面的路径, 另一方面是
+django里面的路径,基本只要路径对了, 其它都是小问题
+
+后来用过了nginx, 发现它的配置比apache清晰好多(对于初学者来说, 特别是我们只需要
+一个Web Server, 但是不需要支持PHP的情况), 部署起来很方便, 所以这次改用nginx
+
+nginx直接和django似乎是不能连接的, 中间需要一个桥梁, 我就随便google了一下, 就
+找到了uWSGI, 另外还有一个Gunicorn, 但是不如uWSGI有名. uWSGI相当于一个中间层,
+一方面通过socket和nginx通讯, 另一方面调用django生成内容, 转发给nginx, 既然是
+中间层, 肯定就不止干倒手数据的事情, uWSGI还可以做更多的事情, 比如负载均衡什么的,
+反正挺好用的就是, 不过目前我也只用了转发数据这一个最基本的功能
+
+uWSGI的官方文档有很详细的nginx, uWSGI, django如何配置使用的介绍, 详见
+[此文](http://uwsgi-docs.readthedocs.org/en/latest/tutorials/Django_and_nginx.html),
+我照着这个文档操作下来, 新建的django工程可以顺利使用, 不过目前的这个项目, 还需要
+一些额外的步骤, 主要是配置文件的修改和文件的放置
+
+### 配置文件
+
+最后验证可用的配置文件见项目里面的`webtools_nginx.conf`和`webtools_uwsgi.ini`,
+需要注意几个地方:
+
+* 这两个文件是放在和项目目录同级的文件夹, 也就是settings.py的上级文件夹
+* `webtools_nginx.conf`里面要指定'/static'的路径, 路径最后必须有'/'
+* upstream一开始测试的时候可以用127.0.0.1的socket, 但实际使用的时候, 还是用
+file socket比较高效
+* uWSGI的配置里面特别要主要chdir这个参数, 一定要配置成这个项目所在的目录, 相应的
+module参数就是wsgi就行, 实际上指的就是项目中的wsgi.py文件. 之所以这样配置, 是
+因为项目中所有import语句参照的根目录就是项目目录, 如果chdir指定成上一级目录了,
+那么所有import包括settings.py里面的很多配置都需要做相应的改动. 前面那篇uWSGI的
+文档中的示例chdir用的就是mysite的上一级目录, 所以module要配置成mysite.wsgi
+* uWSGI配置中的chmod-socket默认是664我测下来不能用, 需要是666才行
+* uWSGI配置中的home应该是virtualenv的虚拟目录的路径, 也就是这个路径下面要有
+bin/activate, 这样uWSGI就可以在virtualenv下运行
+* 两个配置文件中指定的socket file必须是同一个文件
+
+###数据库和静态文件
+
+*注意如果用了virtualenv, 要进入对应的env才能执行下面的命令*
+
+django在settings.py里面配置好数据库路径之后, 只要在app的models.py里面按照规范的
+方法定义的Model, 都可以自动完成数据库的配置, 只要在项目目录下运行
+
+    $ python manager.py migrate
+    $ python manager.py createsuperuser
+
+第一个命令是同步数据库配置, 如果新增了Model, 会自动创建对应的table, 第二个命令
+是新建一个新的超级用户, 这两个命令在django1.7以前是一个命令, 叫
+`python manager.py syncdb`, 在1.7以后拆成两个了
+
+正常来说, 在nginx配置好static的目录后, 静态文件应该是不需要处理的, 但是django有
+自带的管理系统, 他要用到的静态文件需要放在`/static/admin`里面, 而这些文件实际上
+都是存在django自己的目录里面, 我们只要先在settings.py里面配置好`STATIC_ROOT`
+到我们自己的static目录, 然后执行
+
+    $ python manager.py collectstatic 
+
+然后可以检查是否生成了static/admin目录, 下面有css, img, js三个文件夹, 里面有
+admin需要用到的静态文件
+
+### 运行
+
+配置完成之后, 就要开始运行了, 先重启一下nginx
+
+    $ sudo mkdir /var/log/nginx/webapp
+    $ sudo service nginx restart
+
+创建文件夹的操作只要一次就行, 后面日志文件会放在这个文件夹里面, 第二步启动uWSGI
+
+    $ uwsgi --ini django_webtools.ini
+
+然后用浏览器访问127.0.0.1:61111, 这个端口是在`webtools_nginx.conf`里面配置的,
+如果不能访问, 先检查/var/log/nginx/webapp里面两个log文件的信息, 然后看uwsgi的
+输出提示, 另外可以在django的settings.py里面把DEBUG改为True, 这样就可以在网页上
+看到错误提示了, 另外在项目根目录里面还有个error.log可以看错误信息, 后面就是根据
+具体错误提示调整配置, 让其可以正常运行
+
+这里运行uwsgi是前台手工运行, 前面的uWSGI文档后面也有介绍`Emperor mode`的使用
+方法, 以及怎么加入开机启动, 照着操作就行
+
+vim: ft=markdown
+
