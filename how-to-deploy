@@ -88,7 +88,11 @@ admin需要用到的静态文件
 具体错误提示调整配置, 让其可以正常运行
 
 这里运行uwsgi是前台手工运行, 前面的uWSGI文档后面也有介绍`Emperor mode`的使用
-方法, 以及怎么加入开机启动, 照着操作就行
+方法, 以及怎么加入开机启动, 照着操作就行, 另外也可以作为daemon运行, 只要
+
+    $ uwsgi --ini django_webtools.ini --daemonize uwsgi.log
+
+后面的uwsgi.log是输出内容的记录文件, 便于分析错误
 
 vim: ft=markdown
 
